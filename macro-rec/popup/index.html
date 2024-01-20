@@ -2,16 +2,22 @@
 <html>
 <head>
     <title>Macro Recorder</title>
+    <style>
+        body {
+            height: 250px;
+            width: 180px;
+        }
+    </style>
 </head>
 <body>
     <div id="container">
         <form id="recorded-macros">
-            <label for="selectOption">Select an option:</label>
-            <select id="selectOption" name="selectOption">
+            <label for="macroFrm">Select an Macro to apply:</label>
+            <select id="macroOptions" name="selectOption">
                 <!-- <option value="option1">Option 1</option> -->
             </select>
-            <button>Submit</button>
-            <button>Delete</button>
+            <button id="start-macro">Submit</button>
+            <button id="delete-macro">Delete</button>
         </form>
     </div>
 </body>
