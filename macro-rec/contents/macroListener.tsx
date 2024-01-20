@@ -97,33 +97,37 @@ function clickSelectorPaths(selectorPaths:[string]) {
 }
 
 
-const preloadWebpage = async () => {
-    /*
-    * Preload the webpage with the recorded steps
-    preloaded steps container example:
-    {
-        "preloads": {
-            "google.com": {
-                "uri": [selectorPath1, selectorPath2, ...]
-            }
+async function checkLoadedState(mainStorage,hostname:string,uri:string) {
+    const postLoads = mainStorage[hostname][uri];
+    if (postLoads) {
+        return true
     }
-    */
-    const mainStorage =  await storage.get(storageName);
-    if (mainStorage.hasOwnProperty("preloads")) {
-        const preloads  = mainStorage['preloads'];
-        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-            const currentURI = tabs[0].url;
-            const domainName = new URL(currentURI).hostname;
-            if (preloads.hasOwnProperty(domainName)) {
-                const domainSteps = preloads[domainName];
-                if (domainSteps.hasOwnProperty(currentURI)) {
-                    clickSelectorPaths(domainSteps[currentURI])
-                }
-            }
-        });
-    }
+    return false
 }
 
+
+const asyncLoadState = async (mainStorage,hostname,uri) =>{
+    return await checkLoadedState(mainStorage,hostname,uri)
+}
+
+
+storage.get(storageName).then((value) => {
+    // preload the recorded macros for the current page
+    chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {  
+        const currentURI = tabs[0].url;
+        const hostname = new URL(currentURI).hostname;
+        const webPageURI: any | boolean = value[hostname] ? value[hostname] : false;
+        const loadState = asyncLoadState(value,hostname, currentURI)
+        if (!loadState) return // page already preloaded 
+        if (webPageURI) {
+            const steps:[string] | boolean = webPageURI[currentURI] ? value[currentURI] : false;
+            if (typeof steps === "object") {
+                clickSelectorPaths(steps);
+            }
+        }
+
+    });
+});
 
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
