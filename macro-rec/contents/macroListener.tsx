@@ -83,6 +83,14 @@ async function finalizeRecordings() {
 }
 
 
+async function tagContentCopy(event:HTMLEmbedElement) {
+
+}
+
+
+
+document.addEventListener('keydown',tagContentCopy)
+
 
 function clickSelectorPaths(selectorPaths:[string]) {
     /*
